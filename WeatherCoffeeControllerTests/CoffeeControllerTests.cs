@@ -1,8 +1,6 @@
-using System.Net;
 using System;
 using WeatherCoffeeMachineAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 
 namespace WeatherCoffeeControllerTests
 { 
@@ -22,7 +20,6 @@ namespace WeatherCoffeeControllerTests
             Assert.Equal(418, result.StatusCode);
             Assert.Equal("I'm a teapot", result.Value);
         }
-
         [Fact]
         public async Task BrewCoffee_ReturnsStatusCode503_OnFifthCall()
         {
@@ -44,17 +41,11 @@ namespace WeatherCoffeeControllerTests
                 }
             }
         }
-
         [Fact]
         public async Task BrewCoffee_ReturnsOkResult_WhenTemperatureIsBelow30()
         {
             // Arrange
             var controller = new CoffeeController();
-            var weatherResponse = "{\"main\":{\"temp\":25.0}}";
-            var mockHttpClient = new Mock<IHttpClientFactory>();
-            mockHttpClient.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(new HttpClient(new MockHttpMessageHandler(weatherResponse)));
-
-            controller._httpClientFactory = mockHttpClient.Object;
 
             // Act
             var result = await controller.BrewCoffee(temp: 25.0) as OkObjectResult;
@@ -73,9 +64,6 @@ namespace WeatherCoffeeControllerTests
         {
             // Arrange
             var controller = new CoffeeController();
-            var weatherResponse = "{\"main\":{\"temp\":31.0}}";
-            var mockHttpClient = new Mock<IHttpClientFactory>();
-            mockHttpClient.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(new HttpClient(new MockHttpMessageHandler(weatherResponse)));
 
             // Act
             var result = await controller.BrewCoffee(temp: 31.0) as OkObjectResult;
@@ -87,23 +75,6 @@ namespace WeatherCoffeeControllerTests
             Assert.NotNull(responseValue);
             Assert.True(responseValue.GetType().GetProperty("message") != null);
             Assert.Equal("Your refreshing iced coffee is ready", responseValue?.GetType()?.GetProperty("message")?.GetValue(responseValue));
-        }
-    
-    }
-
-    public class MockHttpMessageHandler : HttpMessageHandler
-    {
-        private readonly string _response;
-
-        public MockHttpMessageHandler(string response)
-        {
-            _response = response;
-        }
-
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent(_response) };
-            return Task.FromResult(response);
         }
     }
 }
