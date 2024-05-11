@@ -4,7 +4,7 @@ using WeatherCoffeeMachineAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace WeatherCoffeeControllerTests 
+namespace WeatherCoffeeControllerTests
 { 
     public class CoffeeControllerTests
     {
